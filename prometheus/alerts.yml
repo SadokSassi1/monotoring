@@ -1,0 +1,66 @@
+groups:
+  - name: resource_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 70
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected on {{ $labels.instance }}"
+          description: "CPU usage has exceeded 70% for the past minute on {{ $labels.instance }}."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 70
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Memory usage detected on {{ $labels.instance }}"
+          description: "Memory usage has exceeded 70% for the past minute on {{ $labels.instance }}."
+
+      - alert: HighDiskUsage
+        expr: 100 - (node_filesystem_free_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100) > 70
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Disk usage detected on {{ $labels.instance }}"
+          description: "Disk usage has exceeded 70% for the past minute on {{ $labels.instance }}."
+
+      - alert: HighDiskSpaceUsage
+        expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100 > 85
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High disk space usage detected on {{ $labels.instance }}"
+          description: "Disk space usage has exceeded 85% on {{ $labels.instance }} for the past minute."
+
+      - alert: HighNetworkTraffic
+        expr: rate(node_network_receive_bytes_total[1m]) > 10000000 or rate(node_network_transmit_bytes_total[1m]) > 10000000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network traffic detected on {{ $labels.instance }}"
+          description: "Network traffic has exceeded the threshold for the past minute on {{ $labels.instance }}."
+
+      - alert: HTTPServiceDown
+        expr: up{job="http_service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP service is down on {{ $labels.instance }}"
+          description: "HTTP service on {{ $labels.instance }} has been down for the past minute."
+
+  # NGINX Server Down Alert (Commented out)
+  # - alert: NGINXDown
+  #   expr: up{job="nginx"} == 0
+  #   for: 1m
+  #   labels:
+  #     severity: critical
+  #   annotations:
+  #     summary: "NGINX server is down on {{ $labels.instance }}"
+  #     description: "NGINX server on {{ $labels.instance }} has been down for the past minute."

@@ -1,0 +1,18 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'sadoksassi2@gmail.com'
+  smtp_auth_username: 'sadoksassi2@gmail.com'
+  smtp_auth_password: 'ajkf zlop uzah owlo'
+  smtp_require_tls: true
+
+route:
+  receiver: 'email-alert'
+  repeat_interval: 5m
+
+receivers:
+  - name: 'email-alert'
+    email_configs:
+      - to: 'sadoksassi2@gmail.com'
+        send_resolved: true
+
+
